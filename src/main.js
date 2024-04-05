@@ -5,11 +5,19 @@ import { renderImages } from "./js/render-functions.js";
 
 let keyWord;
 
+let page = 1;
+
+let perPage = 15;
+
+let maxPage;
+
 const galleryImgs = document.querySelector(".gallery");
 
 const form = document.querySelector("form");
 
 const loader = document.querySelector(".loader");
+
+const showMore = document.querySelector(".load-more-btn");
 
 
 // описуємо лоадер 
@@ -22,15 +30,13 @@ function hideLoader(){
     loader.classList.add("is-hidden");
 }
 
-function validInput(event) {
-
-    event.preventDefault();
+async function  submitHandler (event) {
+    try {
+        event.preventDefault();
     
     galleryImgs.innerHTML = "";
 
-   keyWord = event.target.elements.search.value.trim();
-
-    showLoader();
+   keyWord = event.target.elements.search.value.trim();    
 
     if (keyWord === ""){
         iziToast.warning({
@@ -41,7 +47,13 @@ function validInput(event) {
         return
     }
 
-    fetchImages(keyWord).then(data =>{
+    showLoader();   
+
+        const data = await fetchImages(keyWord, page, perPage);
+        page += 1;
+        if (page > 1){
+            showMore.classList.remove("is-hidden");
+        }
         if (data.hits.length === 0){
             iziToast.error({
                 message: "Sorry, there are no images matching your search query. Please try again!",
@@ -51,20 +63,48 @@ function validInput(event) {
             })
         }
 
+        maxPage = Math.ceil(data.totalHits / perPage);
         renderImages(data.hits)
+    } catch (error){
 
-        event.target.reset();
-
-        return
-    })
-    .catch(error => {console.log(error);
+        console.log (error)
         iziToast.error({
-          title: 'Error',
-          message: `Sorry, there are no images matching your search query. Please, try again!`,
-          position: 'topRight'}
-          )
-        }).finally(() => hideLoader())
-      }
+            title: 'Error',
+            message: `Sorry, there are no images matching your search query. Please, try again!`,
+            position: 'topRight'}
+            )
 
-form.addEventListener("submit", validInput);
+    }finally {
+        hideLoader();
+    }
+}
+
+async function showMoreClicked () {
+    page += 1;
+    showLoader();
+
+    try {
+        const data = await fetchImages (keyWord, page);
+        renderImages(data.hits);
+        if (page >= maxPage) {
+            showMore.classList.add("is-hidden");
+
+            iziToast.show({
+                color: 'green',
+                message: `Sorry, you have reached the end of collection.`,
+                position: 'topCenter',
+                timeout: 3000,
+              });
+        }
+    } catch (error) {
+        console.log (error)
+    } finally {
+        hideLoader();
+    }
+}
+
+
+form.addEventListener("submit", submitHandler);
+showMore.addEventListener("click", showMoreClicked);
+
 
