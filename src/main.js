@@ -22,6 +22,27 @@ const showMore = document.querySelector(".load-more-btn");
 
 // описуємо лоадер 
 
+function scrollPage() {
+    const galleryItem = document.querySelector(".gallery-item");
+    const cardHeight = galleryItem.getBoundingClientRect().height;
+    const scrollDistance = cardHeight * 2;
+    window.scrollTo({
+        top: scrollDistance*2,
+        behavior: "smooth"
+    });
+    console.log(scrollDistance)
+}
+
+function scrollSpeed() {
+    const list = document.querySelector(".gallery")
+    const firstChild = list.children[0]
+    const cardHeight = firstChild.getBoundingClientRect().height;
+    window.scrollBy({
+        top: cardHeight * 2,
+        behavior: "smooth"
+    });
+
+}
 function showLoader(){
     loader.classList.remove("is-hidden");
 }
@@ -50,8 +71,8 @@ async function  submitHandler (event) {
     showLoader();   
 
         const data = await fetchImages(keyWord, page, perPage);
-        page += 1;
-        if (page > 1){
+        page = 1;
+        if (page >= 1){
             showMore.classList.remove("is-hidden");
         }
         if (data.hits.length === 0){
@@ -65,6 +86,7 @@ async function  submitHandler (event) {
 
         maxPage = Math.ceil(data.totalHits / perPage);
         renderImages(data.hits)
+         
     } catch (error){
 
         console.log (error)
@@ -86,6 +108,7 @@ async function showMoreClicked () {
     try {
         const data = await fetchImages (keyWord, page);
         renderImages(data.hits);
+        scrollPage();
         if (page >= maxPage) {
             showMore.classList.add("is-hidden");
 
@@ -106,5 +129,11 @@ async function showMoreClicked () {
 
 form.addEventListener("submit", submitHandler);
 showMore.addEventListener("click", showMoreClicked);
+// document.addEventListener("DOMContentLoaded", () => {
+//     scrollSpeed();
+// })
+
+
+
 
 

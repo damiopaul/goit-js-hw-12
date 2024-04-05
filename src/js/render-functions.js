@@ -8,6 +8,7 @@ const galleryImgs = document.querySelector(".gallery");
 
 const lightbox = new SimpleLightbox('.gallery a', {caprionsData: 'alt'});
 
+
 export function renderImages(data) {
     const galleryMarkup = data.map(({largeImageURL,webformatURL,tags,likes,views,comments,downloads})=> {
         return `<li class="gallery-item">
