@@ -129,9 +129,7 @@ async function showMoreClicked () {
 
 form.addEventListener("submit", submitHandler);
 showMore.addEventListener("click", showMoreClicked);
-// document.addEventListener("DOMContentLoaded", () => {
-//     scrollSpeed();
-// })
+
 
 
 
