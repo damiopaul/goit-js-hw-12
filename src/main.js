@@ -62,7 +62,7 @@ async function  submitHandler (event) {
 
         const data = await fetchImages(keyWord, page, perPage);
         
-        if (page >= 1 && data.hits.length !==0){
+        if (page >= 1 && data.hits.length !== 0){
             showMore.classList.remove("is-hidden");
         }
         if (data.hits.length === 0){
