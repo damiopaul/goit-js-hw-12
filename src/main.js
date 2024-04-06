@@ -27,22 +27,12 @@ function scrollPage() {
     const cardHeight = galleryItem.getBoundingClientRect().height;
     const scrollDistance = cardHeight * 2;
     window.scrollTo({
-        top: scrollDistance*2,
+        top: window.scrollY + scrollDistance, //виправлено скрол, додано window.scrollY для відслідковування координат і скролу вниз
         behavior: "smooth"
     });
     console.log(scrollDistance)
 }
 
-function scrollSpeed() {
-    const list = document.querySelector(".gallery")
-    const firstChild = list.children[0]
-    const cardHeight = firstChild.getBoundingClientRect().height;
-    window.scrollBy({
-        top: cardHeight * 2,
-        behavior: "smooth"
-    });
-
-}
 function showLoader(){
     loader.classList.remove("is-hidden");
 }
@@ -54,7 +44,7 @@ function hideLoader(){
 async function  submitHandler (event) {
     try {
         event.preventDefault();
-    
+        page = 1;
     galleryImgs.innerHTML = "";
 
    keyWord = event.target.elements.search.value.trim();    
@@ -71,8 +61,8 @@ async function  submitHandler (event) {
     showLoader();   
 
         const data = await fetchImages(keyWord, page, perPage);
-        page = 1;
-        if (page >= 1){
+        
+        if (page >= 1 && data.hits.length !==0){
             showMore.classList.remove("is-hidden");
         }
         if (data.hits.length === 0){
@@ -88,11 +78,11 @@ async function  submitHandler (event) {
         renderImages(data.hits)
          
     } catch (error){
-
+        showMore.classList.add("is-hidden");
         console.log (error)
         iziToast.error({
             title: 'Error',
-            message: `Sorry, there are no images matching your search query. Please, try again!`,
+            message: `${error}`,
             position: 'topRight'}
             )
 
@@ -121,6 +111,12 @@ async function showMoreClicked () {
         }
     } catch (error) {
         console.log (error)
+        iziToast.show({
+            color: 'green',
+            message: `${error}`,
+            position: 'topCenter',
+            timeout: 3000,
+          });
     } finally {
         hideLoader();
     }
